@@ -27,3 +27,49 @@ export const CompanyFragment = gql`
     }
   }
 `;
+
+export const JobFragment = gql`
+  fragment JobFragment on JobRecord {
+    id
+    title
+    remoteok
+    featuredjob
+    baseannualsalary
+    dateposted
+    experiencelevel
+    jobtype
+    jobcategory
+    applicationlink
+    company {
+      id
+      name
+      slug
+      logo {
+        alt
+        filename
+        url
+        height
+        width
+        id
+      }
+    }
+    skillstags {
+      name
+    }
+    aboutyou {
+      value
+    }
+    jobresponsibilities {
+      value
+    }
+    jobdescription {
+      value
+    }
+    remunerationpackage {
+      value
+    }
+    company {
+      name
+    }
+  }
+`;

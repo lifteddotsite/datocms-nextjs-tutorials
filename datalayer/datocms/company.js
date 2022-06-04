@@ -41,6 +41,6 @@ export const getCompanyBySlug = async ({ slug }) => {
     }
   `;
   const variables = { slug };
-  const rawCompanies = await client.query({ query, variables });
-  return rawCompanies;
+  const rawCompany = await client.query({ query, variables });
+  return rawCompany;
 };
