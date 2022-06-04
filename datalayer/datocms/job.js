@@ -13,6 +13,9 @@ export const getJobs = async () => {
     query {
       allJobs {
         ...JobFragment
+        relatedjobs {
+          ...JobFragment
+        }
       }
     }
   `;
@@ -229,6 +232,9 @@ export const searchJobs = async (query) => {
         }
       ) {
         ...JobFragment
+        relatedjobs {
+            ...JobFragment
+          }
       }
     }
   `;

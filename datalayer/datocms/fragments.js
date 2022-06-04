@@ -54,6 +54,7 @@ export const JobFragment = gql`
       }
     }
     skillstags {
+      id
       name
     }
     aboutyou {
@@ -67,9 +68,6 @@ export const JobFragment = gql`
     }
     remunerationpackage {
       value
-    }
-    company {
-      name
     }
   }
 `;
