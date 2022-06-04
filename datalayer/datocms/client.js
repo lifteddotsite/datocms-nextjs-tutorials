@@ -8,7 +8,7 @@ function isServer() {
 }
 
 const serverOnlyCreateClient = () => {
-  if (!isServer()) return;
+  if (!isServer() || process.env.DATALAYER_ENGINE != 'datocms') return;
   const token = process.env.DATOCMS_READ_ONLY_TOKEN;
   const httpLink = createHttpLink({
     uri: process.env.DATOCMS_GRAPHQL_ENDPOINT,
