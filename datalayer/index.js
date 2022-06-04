@@ -1,13 +1,14 @@
-import  * as contentfulJobAPI from './contentful/job'; 
-import * as contentfulCompanyAPI from './contentful/company'; 
+import * as contentfulJobAPI from './contentful/job';
+import * as contentfulCompanyAPI from './contentful/company';
 
-let datasource = {}
+import * as datocmsJobAPI from './datocms/job';
+import * as datocmsCompanyAPI from './datocms/company';
+
+let datasource = {};
 if (process.env.DATALAYER_ENGINE === 'contentful')
-  datasource = {...contentfulCompanyAPI, ...contentfulJobAPI}
+  datasource = { ...contentfulCompanyAPI, ...contentfulJobAPI };
 
+if (process.env.DATALAYER_ENGINE === 'datocms')
+  datasource = { ...datocmsJobAPI, ...datocmsCompanyAPI };
 
-export default datasource
-
-
-
-
+export default datasource;
