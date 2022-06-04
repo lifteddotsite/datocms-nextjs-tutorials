@@ -89,26 +89,25 @@ export const searchJobs = async (query) => {
   const selectedTagsIds = []; //TODO
   const matchingCompaniesIds = []; //TODO
   const searchFilters = `
-    { title: { matches: { pattern: $search, caseSensitive: false } } }
-    {
-      jobcategory: {
-        matches: { pattern: $search, caseSensitive: false }
-      }
-    }
-    { jobdescription: { matches: { pattern: $search, caseSensitive: false } } }
-    { aboutyou: { matches: { pattern: $search, caseSensitive: false } } }
-    { jobresponsibilities: { matches: { pattern: $search, caseSensitive: false } } }
-    { remunerationpackage: { matches: { pattern: $search, caseSensitive: false } } }
-
-    { experiencelevel: { matches: { pattern: $search, caseSensitive: false } } }
-    { jobtype: { matches: { pattern: $search, caseSensitive: false } } }
-
+    OR: [
+        { title: { matches: { pattern: $search, caseSensitive: false } } }
+        {
+          jobcategory: {
+            matches: { pattern: $search, caseSensitive: false }
+          }
+        }
+        { jobdescription: { matches: { pattern: $search, caseSensitive: false } } }
+        { aboutyou: { matches: { pattern: $search, caseSensitive: false } } }
+        { jobresponsibilities: { matches: { pattern: $search, caseSensitive: false } } }
+        { remunerationpackage: { matches: { pattern: $search, caseSensitive: false } } }
+    
+        { experiencelevel: { matches: { pattern: $search, caseSensitive: false } } }
+        { jobtype: { matches: { pattern: $search, caseSensitive: false } } }
+    ],
     `;
 
   const variables = {};
   if (search) variables.search = search;
-  if (remoteOkOnly) variables.remoteOkOnly = remoteOkOnly;
-  if (featuredJobsOnly) variables.featuredJobsOnly = featuredJobsOnly;
   if (minBaseSalary) variables.minBaseSalary = minBaseSalary;
   if (maxBaseSalary) variables.maxBaseSalary = maxBaseSalary;
 
@@ -120,67 +119,67 @@ export const searchJobs = async (query) => {
   if (matchingCompaniesIds && matchingCompaniesIds.length)
     variables.matchingCompaniesIds = matchingCompaniesIds;
 
-  const gqlquery = gql`
-    query searchJobs(
-      ${search ? '$search: String!' : ''}
-      ${remoteOkOnly ? '$remoteOkOnly: Boolean' : ''}
-      ${featuredJobsOnly ? '$featuredJobsOnly: Boolean' : ''}
-      ${minBaseSalary ? '$minBaseSalary: Float' : ''}
-      ${maxBaseSalary ? '$maxBaseSalary: Float' : ''}
+  const oneOrMoreVars = !!Object.keys(variables).length;
+  const gqlvariables = oneOrMoreVars
+    ? `(
+        ${search ? '$search: String!' : ''}
+        ${minBaseSalary ? '$minBaseSalary: FloatType' : ''}
+        ${maxBaseSalary ? '$maxBaseSalary: FloatType' : ''}
+    
+        ${jobTypes && jobTypes.length ? '$jobTypes: [String]' : ''}
+        ${
+          experienceLevels && experienceLevels.length
+            ? '$experienceLevels: [String]'
+            : ''
+        }
+        ${
+          selectedTagsIds && selectedTagsIds.length
+            ? '$selectedTagsIds: [ItemId]'
+            : ''
+        }
+        ${
+          matchingCompaniesIds && matchingCompaniesIds.length
+            ? '$matchingCompaniesIds: [ItemId]'
+            : ''
+        }
+        )`
+    : '';
 
-      ${jobTypes && jobTypes.length ? '$jobTypes: [String]' : ''}
-      ${
-        experienceLevels && experienceLevels.length
-          ? '$experienceLevels: [String]'
-          : ''
-      }
-      ${
-        selectedTagsIds && selectedTagsIds.length
-          ? '$selectedTagsIds: [ItemId]'
-          : ''
-      }
-      ${
-        matchingCompaniesIds && matchingCompaniesIds.length
-          ? '$matchingCompaniesIds: [ItemId]'
-          : ''
-      }
-    ) {
-      allJobs(
+  const gqlquery = gql`
+    query searchJobs 
+       ${gqlvariables}
+      {
+       allJobs(
         filter: {
-          OR: [
             ${search ? searchFilters : ''}
-            ${remoteOkOnly ? '{ remoteok: { eq: $remoteOkOnly } }' : ''}
+            ${remoteOkOnly ? ' remoteok: { eq: true } ,' : ''}
+            ${featuredJobsOnly ? ' featuredjob: { eq: true } ,' : ''}  
             ${
-              featuredJobsOnly
-                ? '{ featuredjob: { eq: $featuredJobsOnly } }'
-                : ''
-            }  
-            ${
-              minBaseSalary ? '{baseannualsalary: {gte: $minBaseSalary } }' : ''
+              minBaseSalary ? 'baseannualsalary: {gte: $minBaseSalary } ,' : ''
             } 
             ${
-              maxBaseSalary ? '{baseannualsalary: {lte: $maxBaseSalary } }' : ''
+              maxBaseSalary ? 'baseannualsalary: {lte: $maxBaseSalary } ,' : ''
             } 
             ${
               experienceLevels && experienceLevels.length
-                ? '{experiencelevel: {in: $experienceLevels}}'
+                ? 'experiencelevel: {in: $experienceLevels},'
                 : ''
             }
-            ${jobTypes && jobTypes.length ? '{jobtype: {in: $jobTypes}}' : ''}
+            ${jobTypes && jobTypes.length ? 'jobtype: {in: $jobTypes},' : ''}
             ${
               selectedTagsIds && selectedTagsIds.length
-                ? '{skillsTags: {in: $selectedTagsIds}}'
+                ? 'skillsTags: {in: $selectedTagsIds},'
                 : ''
             }
             ${
               matchingCompaniesIds && matchingCompaniesIds.length
-                ? '{company: {in: $matchingCompaniesIds}}'
+                ? 'company: {in: $matchingCompaniesIds},'
                 : ''
             }
-          ]
         }
       ) {
         title
+        remoteok
       }
     }
   `;
