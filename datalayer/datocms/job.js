@@ -177,7 +177,7 @@ export const searchJobs = async (query) => {
   const variables = {};
   if (search) variables.search = search;
   if (minBaseSalary) variables.minBaseSalary = minBaseSalary;
-  if (maxBaseSalary) variables.maxBaseSalary = 150000;
+  if (maxBaseSalary) variables.maxBaseSalary = maxBaseSalary;
 
   if (jobTypes && jobTypes.length) variables.jobTypes = jobTypes;
   if (experienceLevels && experienceLevels.length)
@@ -248,7 +248,6 @@ export const searchJobs = async (query) => {
     }
   `;
 
-  console.log({ variables });
   const res = await client.query({ query: gqlquery, variables });
   const rawJobs = res.data.allJobs;
   const jobs = rawJobs.map((rawJob) => jobReducer(rawJob, false));

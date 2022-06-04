@@ -1,4 +1,5 @@
 import date from 'date-and-time';
+import { render } from 'datocms-structured-text-to-html-string';
 
 export const dateReducer = (dateStr) => {
   const dateObj = date.parse(dateStr.split('T')[0], 'YYYY-MM-DD');
@@ -6,7 +7,7 @@ export const dateReducer = (dateStr) => {
 };
 
 export const richTextReducer = (rawRichtext) => {
-  return rawRichtext;
+  return render(rawRichtext.value.document);
 };
 
 export const imageReducer = (imageField) => {
@@ -39,7 +40,6 @@ export const skillsReducer = (parsedTags) => {
 };
 
 export const jobReducer = (rawJob, parseRelatedJobs = true) => {
-  // return rawJob;
   const job = {};
   job.id = rawJob.id;
   job.slug = rawJob.slug;
@@ -55,14 +55,12 @@ export const jobReducer = (rawJob, parseRelatedJobs = true) => {
   job.company = companyReducer(rawJob.company);
   job.skills = skillsReducer(rawJob.skillstags);
 
-  //   job.aboutYou = richTextReducer(rawJob.aboutyou);
-  //   job.jobResponsibilities = richTextReducer(rawJob.jobresponsibilities);
-  //   job.jobDescription = richTextReducer(rawJob.jobdescription);
-  //   job.remunerationPackage = richTextReducer(rawJob.remunerationpackage);
+  job.aboutYou = richTextReducer(rawJob.aboutyou);
+  job.jobResponsibilities = richTextReducer(rawJob.jobresponsibilities);
+  job.jobDescription = richTextReducer(rawJob.jobdescription);
+  job.remunerationPackage = richTextReducer(rawJob.remunerationpackage);
 
   const relatedJobs = rawJob.relatedjobs || [];
-
-  console.log({ relatedJobs });
 
   if (!parseRelatedJobs) {
     job.relatedJobs = [];
