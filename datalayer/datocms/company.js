@@ -18,6 +18,32 @@ export const getCompanies = async () => {
   return rawCompanies;
 };
 
+export const searchCompanies = async ({ search }) => {
+  if (!search) return [];
+  const query = gql`
+    query searchCompanies($search: String!) {
+      allCompanies(
+        filter: {
+          OR: [
+            { name: { matches: { pattern: $search, caseSensitive: false } } }
+            { city: { matches: { pattern: $search, caseSensitive: false } } }
+            { slogan: { matches: { pattern: $search, caseSensitive: false } } }
+            { website: { matches: { pattern: $search, caseSensitive: false } } }
+          ]
+        }
+      ) {
+        id
+        name
+      }
+    }
+  `;
+
+  const variables = { search };
+
+  const rawCompanies = await client.query({ query, variables });
+  return rawCompanies.data.allCompanies;
+};
+
 export const getCompaniesSlugs = async () => {
   const query = gql`
     query {

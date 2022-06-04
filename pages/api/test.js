@@ -14,10 +14,14 @@ export default async function handler(req, res) {
   // });
 
   const data = await datasource.searchJobs({
-    searchBarText: 'Dev',
-    // remoteOkOnly: true,
-    // featuredJobsOnly: true,
-    maxBaseSalary: 80000,
+    searchBarText: 'ReactJs',
+    remoteOkOnly: false,
+    featuredJobsOnly: false,
+    maxBaseSalary: 160000,
+    minBaseSalary: 10000,
+    experienceLevels: ['Tech-Lead', 'Junior'],
+    jobTypes: ['Part-Time', 'Full-Time'],
+    seletedTags: ['CSS3'],
   });
-  res.status(200).json({ data });
+  res.status(200).json(data);
 }
