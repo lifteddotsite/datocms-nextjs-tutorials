@@ -34,6 +34,7 @@ export const JobFragment = gql`
   fragment JobFragment on JobRecord {
     id
     title
+    slug
     remoteok
     featuredjob
     baseannualsalary
@@ -45,10 +46,12 @@ export const JobFragment = gql`
     company {
       id
       name
+      city
       slug
       logo {
         alt
         filename
+        mimeType
         url
         height
         width

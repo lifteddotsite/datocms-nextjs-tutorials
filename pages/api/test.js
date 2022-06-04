@@ -2,14 +2,16 @@ import datasource from '../../datalayer';
 
 export default async function handler(req, res) {
   // const data = await datasource.getCompanies();
-  // const data = await datasource.getJobs();
+  const data = await datasource.getJobs();
+  // const data = await datasource.getJobsSkills();
+  // const data = await datasource.getJobsSlugs();
   // const data = await datasource.getCompaniesSlugs();
   // const data = await datasource.getJobBySlug({
   //   slug: 'senior-software-engineer-nextjs-reactjs',
   // });
-  const data = await datasource.getCompanyBySlug({
-    slug: 'lifted-ventures-ltd',
-  });
+  // const data = await datasource.getCompanyBySlug({
+  //   slug: 'lifted-ventures-ltd',
+  // });
   // const data = await datasource.getJobsByCompanyId({
   //   id: '21945202',
   // });

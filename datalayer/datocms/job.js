@@ -8,20 +8,21 @@ import { JobFragment } from './fragments';
 import { searchCompanies } from './company';
 
 export const getJobs = async () => {
+  const getRelatedJobs = false;
   const query = gql`
     ${JobFragment}
     query {
       allJobs {
         ...JobFragment
-        relatedjobs {
-          ...JobFragment
-        }
+        ${getRelatedJobs ? 'relatedjobs { ...JobFragment }' : ''}
       }
     }
   `;
 
-  const rawJobs = await client.query({ query });
-  return rawJobs;
+  const res = await client.query({ query });
+  const rawJobs = res.data.allJobs;
+  const jobs = rawJobs.map((rawJob) => jobReducer(rawJob, getRelatedJobs));
+  return jobs;
 };
 
 export const getJobsSkills = async () => {
@@ -34,11 +35,12 @@ export const getJobsSkills = async () => {
     }
   `;
   const variables = { tagtype: 'skill' };
-  const rawJobsSkills = await client.query({ query, variables });
-  return rawJobsSkills;
+  const res = await client.query({ query, variables });
+  const rawJobsSkills = res.data.allTags;
+  return skillsReducer(rawJobsSkills);
 };
 
-export const searchJobsSkills = async ({ seletedTags, search = '' }) => {
+const searchJobsSkills = async ({ seletedTags, search = '' }) => {
   const query = gql`
     query searchJobsSkills(
       $tagtype: String!
@@ -81,7 +83,10 @@ export const getJobsSlugs = async () => {
   `;
 
   const rawSlugs = await client.query({ query });
-  return rawSlugs;
+  const slugs = rawSlugs.data.allJobs.map((rawSlug) => {
+    return rawSlug.slug;
+  });
+  return slugs;
 };
 
 export const getJobBySlug = async ({ slug }) => {
@@ -90,12 +95,16 @@ export const getJobBySlug = async ({ slug }) => {
     query getJobBySlug($slug: String!) {
       job(filter: { slug: { eq: $slug } }) {
         ...JobFragment
+        relatedjobs {
+          ...JobFragment
+        }
       }
     }
   `;
   const variables = { slug };
-  const rawJob = await client.query({ query, variables });
-  return rawJob;
+  const res = await client.query({ query, variables });
+  const rawJob = res.data.job;
+  return jobReducer(rawJob, true);
 };
 
 export const getJobsByCompanyId = async ({ id }) => {

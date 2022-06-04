@@ -14,7 +14,8 @@ export const getCompanies = async () => {
     }
   `;
 
-  const rawCompanies = await client.query({ query });
+  const res = await client.query({ query });
+  const rawCompanies = res.data.allCompanies;
   const companies = rawCompanies.map((company) => companyReducer(company));
   return companies;
 };
