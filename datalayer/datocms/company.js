@@ -15,7 +15,8 @@ export const getCompanies = async () => {
   `;
 
   const rawCompanies = await client.query({ query });
-  return rawCompanies;
+  const companies = rawCompanies.map((company) => companyReducer(company));
+  return companies;
 };
 
 export const searchCompanies = async ({ search }) => {
@@ -54,7 +55,10 @@ export const getCompaniesSlugs = async () => {
   `;
 
   const rawSlugs = await client.query({ query });
-  return rawSlugs;
+  const slugs = rawSlugs.data.allCompanies.map((rawSlug) => {
+    return rawSlug.slug;
+  });
+  return slugs;
 };
 
 export const getCompanyBySlug = async ({ slug }) => {
@@ -68,5 +72,5 @@ export const getCompanyBySlug = async ({ slug }) => {
   `;
   const variables = { slug };
   const rawCompany = await client.query({ query, variables });
-  return rawCompany;
+  return companyReducer(rawCompany.data.company);
 };

@@ -12,6 +12,7 @@ export const CompanyFragment = gql`
     coverimage {
       alt
       filename
+      mimeType
       url
       height
       width
@@ -20,6 +21,7 @@ export const CompanyFragment = gql`
     logo {
       alt
       filename
+      mimeType
       url
       height
       width
