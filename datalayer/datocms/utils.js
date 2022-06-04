@@ -21,3 +21,4 @@ export const skillsReducer = (parsedTags) => {
 
 export const jobReducer = (rawJob, parseRelatedJobs = true) => {
 };
+
