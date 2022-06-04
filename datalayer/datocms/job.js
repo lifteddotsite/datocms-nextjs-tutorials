@@ -40,17 +40,18 @@ export const getJobsSkills = async () => {
   return skillsReducer(rawJobsSkills);
 };
 
-const searchJobsSkills = async ({ seletedTags, search = '' }) => {
+const searchJobsSkills = async ({ selectedTags = [], search = '' }) => {
+  if (!search && selectedTags.length == 0) return [];
   const query = gql`
     query searchJobsSkills(
       $tagtype: String!
-      $seletedTags: [String]
+      $selectedTags: [String]
      ${search ? '$search: String!' : ''}
     ) {
       allTags(
         filter: {
           OR: [
-            { name: { in: $seletedTags } }
+            { name: { in: $selectedTags } }
            ${
              search
                ? ' { name: { matches: { pattern: $search, caseSensitive: false } } }'
@@ -66,7 +67,7 @@ const searchJobsSkills = async ({ seletedTags, search = '' }) => {
     }
   `;
 
-  const variables = { tagtype: 'skill', seletedTags };
+  const variables = { tagtype: 'skill', selectedTags };
   if (search) variables.search = search;
 
   const rawTags = await client.query({ query, variables });
@@ -117,8 +118,10 @@ export const getJobsByCompanyId = async ({ id }) => {
     }
   `;
   const variables = { companyId: id };
-  const rawJobs = await client.query({ query, variables });
-  return rawJobs;
+  const res = await client.query({ query, variables });
+  const rawJobs = res.data.allJobs;
+  const jobs = rawJobs.map((rawJob) => jobReducer(rawJob, false));
+  return jobs;
 };
 
 export const searchJobs = async (query) => {
@@ -130,7 +133,7 @@ export const searchJobs = async (query) => {
     maxBaseSalary,
     jobTypes,
     experienceLevels,
-    seletedTags,
+    selectedTags,
   } = query;
 
   const matchingCompanies = await searchCompanies({ search });
@@ -138,7 +141,7 @@ export const searchJobs = async (query) => {
     ? matchingCompanies.map((company) => company.id)
     : [];
 
-  const machingTags = await searchJobsSkills({ seletedTags, search });
+  const machingTags = await searchJobsSkills({ selectedTags, search });
   const machingTagsIds = machingTags.length
     ? machingTags.map((tag) => tag.id)
     : [];
@@ -174,7 +177,7 @@ export const searchJobs = async (query) => {
   const variables = {};
   if (search) variables.search = search;
   if (minBaseSalary) variables.minBaseSalary = minBaseSalary;
-  if (maxBaseSalary) variables.maxBaseSalary = maxBaseSalary;
+  if (maxBaseSalary) variables.maxBaseSalary = 150000;
 
   if (jobTypes && jobTypes.length) variables.jobTypes = jobTypes;
   if (experienceLevels && experienceLevels.length)
@@ -241,13 +244,13 @@ export const searchJobs = async (query) => {
         }
       ) {
         ...JobFragment
-        relatedjobs {
-            ...JobFragment
-          }
       }
     }
   `;
 
-  const rawJobs = await client.query({ query: gqlquery, variables });
-  return rawJobs;
+  console.log({ variables });
+  const res = await client.query({ query: gqlquery, variables });
+  const rawJobs = res.data.allJobs;
+  const jobs = rawJobs.map((rawJob) => jobReducer(rawJob, false));
+  return jobs;
 };
