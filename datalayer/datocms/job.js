@@ -136,11 +136,17 @@ export const searchJobs = async (query) => {
     selectedTags,
   } = query;
 
+  // we have to do some intermediary queries because datocms doesn't have the ability
+  // to filter based on nested entities' fields beside the id of the nested entity
+  // for more check ==> https://community.datocms.com/t/deep-filtering-on-both-cma-and-cda/291
   const matchingCompanies = await searchCompanies({ search });
   const matchingCompaniesIds = matchingCompanies.length
     ? matchingCompanies.map((company) => company.id)
     : [];
 
+  // we have to do some intermediary queries because datocms doesn't have the ability
+  // to filter based on nested entities' fields beside the id of the nested entity
+  // for more check ==> https://community.datocms.com/t/deep-filtering-on-both-cma-and-cda/291
   const machingTags = await searchJobsSkills({ selectedTags, search });
   const machingTagsIds = machingTags.length
     ? machingTags.map((tag) => tag.id)
